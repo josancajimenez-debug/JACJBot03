@@ -1,16 +1,20 @@
 {
-  "name": "whatsapp-bot",
+  "name": "acc-contadores-whatsapp-bot",
   "version": "1.0.0",
-  "description": "Simple Twilio WhatsApp echo bot",
+  "description": "Chatbot de WhatsApp para ACC.CONTADORES con Twilio (sandbox/producción).",
   "main": "index.js",
+  "type": "module",
+  "engines": { "node": ">=18" },
   "scripts": {
-    "start": "node index.js"
-  },
-  "engines": {
-    "node": ">=18"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
   "dependencies": {
+    "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "twilio": "^4.21.0"
+    "twilio": "^5.3.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
   }
 }
