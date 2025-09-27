@@ -1,6 +1,6 @@
 {
   "name": "acc-contadores-whatsapp-bot",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Chatbot de WhatsApp para ACC.CONTADORES (Twilio, sandbox y producción).",
   "main": "index.js",
   "type": "module",
@@ -16,7 +16,5 @@
   "devDependencies": {
     "nodemon": "^3.1.4"
   },
-  "engines": { "node": ">=18" },
-  "license": "MIT"
+  "engines": { "node": ">=18" }
 }
-
