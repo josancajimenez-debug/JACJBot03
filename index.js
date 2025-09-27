@@ -1,6 +1,6 @@
-import express from "express";
-import dotenv from "dotenv";
-import { twiml as Twiml } from "twilio";
+const express = require("express");
+const dotenv = require("dotenv");
+const { twiml: Twiml } = require("twilio");
 
 dotenv.config();
 
@@ -8,32 +8,26 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 
 const PORT = process.env.PORT || 3000;
-
-const BUSINESS = {
-  nombre: "ACC.CONTADORES",
-  horario: "Lunes a Viernes, 8:00 a.m. – 5:00 p.m. (con previa cita)",
-  moneda: "₡"
-};
+const BUSINESS = { nombre: "ACC.CONTADORES", horario: "L-V 8:00–17:00 (con cita)", moneda: "₡" };
 
 const servicios = {
-  constancias: { nombre: "Constancias de Ingresos", base: 40000, iva: 5200, total: 45200, requisitos: [] },
-  flujos:      { nombre: "Flujos de Efectivo",      base: 40000, iva: 5200, total: 45200, requisitos: [] },
-  asesoria:    { nombre: "Asesoría",                base: 30000, iva: 3900, total: 33900, requisitos: [] },
-  exonet:      { nombre: "EXONET",                  base: 40000, iva: 5200, total: 45200, requisitos: [] },
-  contabilidad:{ nombre: "Contabilidad",            base: 50000, iva: 6500, total: 56500, requisitos: [],
-                 nota: "Cada caso es distinto y se valora según factores." }
+  constancias: { nombre: "Constancias de Ingresos", base: 40000, iva: 5200, total: 45200 },
+  flujos:      { nombre: "Flujos de Efectivo",      base: 40000, iva: 5200, total: 45200 },
+  asesoria:    { nombre: "Asesoría",                base: 30000, iva: 3900, total: 33900 },
+  exonet:      { nombre: "EXONET",                  base: 40000, iva: 5200, total: 45200 },
+  contabilidad:{ nombre: "Contabilidad",            base: 50000, iva: 6500, total: 56500,
+                 nota: "Cada caso se valora según factores." }
 };
 
 const sesiones = new Map();
-
 const num = (n) => new Intl.NumberFormat("es-CR").format(n);
 const norm = (t="") => t.toString().trim().toLowerCase()
   .normalize("NFD").replace(/\p{Diacritic}/gu, "");
 
 const menu = () => [
-  `¡Hola! Soy el asistente virtual de *${BUSINESS.nombre}*.`,
+  `Asistente virtual de *${BUSINESS.nombre}*`,
   `Horario: *${BUSINESS.horario}*`,
-  "Opciones: *servicios*, *horario*, *reservar*, *precio constancias*, *requisitos exonet*"
+  "Opciones: *servicios*, *horario*, *reservar*, *precio constancias*"
 ].join("\n");
 
 const listaServicios = () =>
@@ -80,16 +74,15 @@ app.post("/whatsapp", (req, res) => {
          `Precio: ${BUSINESS.moneda}${num(s.total)} (base ${BUSINESS.moneda}${num(s.base)} + IVA ${BUSINESS.moneda}${num(s.iva)})`,
          s.nota ? `Nota: ${s.nota}` : null].filter(Boolean).join("\n");
   } else if (/requisit/.test(text) && servicioDetectado) {
-    r = [`*Requisitos – ${servicios[servicioDetectado].nombre}*`,
-         "Importante cumplir los requisitos para su emisión."].join("\n");
+    r = `*Requisitos – ${servicios[servicioDetectado].nombre}*: importante cumplir los requisitos para su emisión.`;
   } else if (pideHorario) {
-    r = [`*Horario:* ${BUSINESS.horario}`, "Para reservar: *reservar*"].join("\n");
+    r = `*Horario:* ${BUSINESS.horario}. Para reservar: *reservar*.`;
   } else if (/reserv(ar|a)|cita/.test(text)) {
     ses.estado = "reservando";
     r = "Envíe: nombre, cédula, correo, servicio y 2 horarios posibles.";
   } else if (ses.estado === "reservando") {
     ses.estado = "activo";
-    r = "✅ Recibido. Un asesor confirmará su cita por este medio.";
+    r = "✅ Solicitud de reserva recibida. Confirmaremos por este medio.";
   } else {
     r = "No entendí. Use: *servicios*, *horario*, *reservar*, *precio constancias*…";
   }
@@ -99,3 +92,5 @@ app.post("/whatsapp", (req, res) => {
 
 app.get("/", (_req, res) => res.send("Bot activo. Webhook: POST /whatsapp"));
 app.listen(PORT, () => console.log(`Escuchando en puerto ${PORT}`));
+
+
